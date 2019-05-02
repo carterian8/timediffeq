@@ -132,7 +132,7 @@ if __name__ == '__main__':
 	
 	# Train the model
 	optimizer = tf.train.AdamOptimizer(learning_rate=1e-2)
-	timediffeq.train(dataset, model, optimizer, epochs=1)
+	timediffeq.train(dataset, model, optimizer, epochs=10)
 
 
 

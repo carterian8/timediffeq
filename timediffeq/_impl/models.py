@@ -18,6 +18,14 @@ class LatentODEVae(tf.keras.Model):
 		self.ode_net = ode_net
 		self.decoder = decoder
 
+	def call(self, inputs, **kwargs):
+		input, t = inputs
+		qz0_mean, qz0_logvar = self.encode(input)
+		z0 = self.reparameterize(qz0_mean, qz0_logvar)
+		outputs, states = self.neural_ode_forward(z0, t[0])
+		states = tf.stack(states, axis=1)
+		return self.decode(states), qz0_mean, qz0_logvar, z0, outputs, states
+		
 	def sample(self, eps=None):
 		if eps is None:
 			eps = tf.random.normal(shape=(100, self.latent_dim))

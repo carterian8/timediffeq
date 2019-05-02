@@ -12,12 +12,7 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
 		axis=raxis)
 
 def compute_loss(model, input, t):
-	qz0_mean, qz0_logvar = model.encode(input)
-	z0 = model.reparameterize(qz0_mean, qz0_logvar)
-	outputs, states = model.neural_ode_forward(z0, t[0])
-	pred_x = model.decode(tf.stack(states, axis=1))
-	print(pred_x.shape)
-
+	pred_x, qz0_mean, qz0_logvar, z0, outputs, states = model(inputs=[input, t])
 	cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=pred_x, labels=input)
 	logpx_z = -tf.reduce_sum(cross_ent, axis=[1, 2])
 	logpz = log_normal_pdf(z0, 0., 0.)
@@ -50,7 +45,3 @@ def train(dataset, model, optimizer, epochs=1):
 			loss = compute_gradients_and_update(model, input, t, optimizer)
 			
 			print("Epoch: {}, Batch: {}, Loss: {}".format(epoch, batch, loss))
-			
-
-def test():
-	pass
